@@ -1,5 +1,7 @@
 package com.perobscurus.api;
 
+import com.perobscurus.api.messages.FileUpload;
+import com.perobscurus.api.messages.ImmutableFileUpload;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,7 +25,7 @@ public class FileUploadController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @ResponseBody
-    public DataObjects.FileUpload handleFileUpload(@RequestParam("file") MultipartFile file) {
+    public FileUpload handleFileUpload(@RequestParam("file") MultipartFile file) {
 
         final String localName = String.format("%s/%s-%s", "/tmp", UUID.randomUUID().toString(), file.getOriginalFilename());
 
@@ -32,7 +34,11 @@ public class FileUploadController {
         } catch ( IOException e ) {
             e.printStackTrace();
         }
-        return DataObjects.FileUpload.create(file.getOriginalFilename(), file.getSize());
+
+        return ImmutableFileUpload.builder()
+                .name(file.getOriginalFilename())
+                .size(file.getSize())
+                .build();
     }
 
     // todo: figure out how this can be leveraged

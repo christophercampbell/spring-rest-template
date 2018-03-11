@@ -1,6 +1,8 @@
 package com.perobscurus.api;
 
 import com.google.common.collect.ImmutableList;
+import com.perobscurus.api.messages.Data;
+import com.perobscurus.api.messages.ImmutableData;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -21,8 +23,8 @@ public class DataController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @ResponseBody
-    public DataObjects.Data forId(@PathVariable final int id) {
-        return ImmutableData.builder().id(id).name("cracker").build();
+    public Data forId(@PathVariable final int id) {
+        return Data.create(id, "cracker", new Date());
     }
 
     @RequestMapping(
@@ -33,10 +35,10 @@ public class DataController {
     @ResponseBody
     public ResponseEntity<?> list() {
         final Date now = new Date();
-        ImmutableList.Builder builder = ImmutableList.<DataObjects.Data>builder()
-                .add(DataObjects.Data.create(42, "bar", now))
-                .add(DataObjects.Data.create(69, "foo", now))
-                .add(DataObjects.Data.create(666, "duh", now));
+        ImmutableList.Builder builder = ImmutableList.<Data>builder()
+                .add(ImmutableData.builder().id(42).name("bar").date(now).build())
+                .add(ImmutableData.builder().id(666).name("foo").date(now).build())
+                .add(ImmutableData.builder().id(127).name("fah").date(now).build());
         return ResponseEntity.ok(builder.build());
     }
 }
