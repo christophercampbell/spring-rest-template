@@ -55,6 +55,7 @@ public class ApplicationConfiguration extends WebMvcConfigurationSupport {
 
     /**
      * An implementation of MultipartResolver for file upload.
+     *
      * @return CommonsMultipartResolver
      */
     @Bean
@@ -66,10 +67,11 @@ public class ApplicationConfiguration extends WebMvcConfigurationSupport {
 
     /**
      * Provides property resolving placeholder values, as in key=${some.value}
+     *
      * @return PropertySourcesPlaceholderConfigurer
      */
     @Bean
-    public PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
     }
 }

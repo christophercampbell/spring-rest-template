@@ -3,6 +3,8 @@ package com.perobscurus.api.controllers;
 import com.google.common.base.Preconditions;
 import com.perobscurus.api.messages.FileUpload;
 import com.perobscurus.api.messages.ImmutableFileUpload;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -21,6 +23,8 @@ import java.util.UUID;
 @RequestMapping("/upload")
 public class FileUploadController {
 
+    static final Logger log = LoggerFactory.getLogger(FileUploadController.class);
+
     // Local directory for uploads
     final File dir;
 
@@ -31,6 +35,7 @@ public class FileUploadController {
                 dir.exists() &&
                         dir.canWrite(), String.format("%s does not exist or is not accessible", path)
         );
+        log.info("upload directory: {}", dir.getAbsolutePath());
     }
 
     @RequestMapping(
@@ -41,6 +46,8 @@ public class FileUploadController {
     public FileUpload handleFileUpload(@RequestParam("file") MultipartFile file) {
 
         final File localFile = new File(dir, uniqueName(file.getOriginalFilename()));
+
+        log.info(">>>>>>>>>>> {}", file.getOriginalFilename());
 
         try {
             file.transferTo(localFile);
