@@ -1,4 +1,4 @@
-package com.perobscurus.api;
+package com.perobscurus.api.controllers;
 
 import com.google.common.collect.ImmutableList;
 import com.perobscurus.api.messages.Data;
@@ -24,7 +24,7 @@ public class DataController {
     )
     @ResponseBody
     public Data forId(@PathVariable final int id) {
-        return Data.create(id, "cracker", new Date());
+        return Data.create(id, "foobar", new Date());
     }
 
     @RequestMapping(

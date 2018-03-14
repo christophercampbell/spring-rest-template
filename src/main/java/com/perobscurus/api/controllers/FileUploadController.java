@@ -1,7 +1,10 @@
-package com.perobscurus.api;
+package com.perobscurus.api.controllers;
 
+import com.google.common.base.Preconditions;
 import com.perobscurus.api.messages.FileUpload;
 import com.perobscurus.api.messages.ImmutableFileUpload;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,7 +20,16 @@ import java.util.UUID;
 @RequestMapping("/upload")
 public class FileUploadController {
 
-    public FileUploadController() {
+    // Local directory for uploads
+    final File dir;
+
+    @Autowired
+    public FileUploadController(@Value("${upload.dir}") final String path) {
+        dir = new File(path);
+        Preconditions.checkArgument(
+                dir.exists() &&
+                        dir.canWrite(), String.format("%s does not exist or is not accessible", path)
+        );
     }
 
     @RequestMapping(
@@ -27,11 +39,11 @@ public class FileUploadController {
     @ResponseBody
     public FileUpload handleFileUpload(@RequestParam("file") MultipartFile file) {
 
-        final String localName = String.format("%s/%s-%s", "/tmp", UUID.randomUUID().toString(), file.getOriginalFilename());
+        final File localFile = new File(dir, uniqueName(file.getOriginalFilename()));
 
         try {
-            file.transferTo(new File(localName));
-        } catch ( IOException e ) {
+            file.transferTo(localFile);
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -41,10 +53,7 @@ public class FileUploadController {
                 .build();
     }
 
-    // todo: figure out how this can be leveraged
-    @ExceptionHandler(FileNotFoundException.class)
-    public ResponseEntity<?> handleStorageFileNotFound(FileNotFoundException e) {
-        return ResponseEntity.notFound().build();
+    private String uniqueName(final String basename) {
+        return String.format("%s-%s", basename, UUID.randomUUID().toString());
     }
-
 }

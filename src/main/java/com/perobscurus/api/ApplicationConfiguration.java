@@ -3,9 +3,9 @@ package com.perobscurus.api;
 
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.*;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -20,8 +20,13 @@ import java.util.List;
 @Component
 @Configuration
 @ComponentScan(basePackages = {"com.perobscurus.api"})
+@PropertySources({
+        @PropertySource("classpath:application.properties"),
+        @PropertySource(value = "file:${config.file}", ignoreResourceNotFound = true)
+})
 public class ApplicationConfiguration extends WebMvcConfigurationSupport {
 
+    @Autowired
     public ApplicationConfiguration() {
     }
 
@@ -48,10 +53,23 @@ public class ApplicationConfiguration extends WebMvcConfigurationSupport {
         registry.addResourceHandler("/**").addResourceLocations("/");
     }
 
+    /**
+     * An implementation of MultipartResolver for file upload.
+     * @return CommonsMultipartResolver
+     */
     @Bean
     public CommonsMultipartResolver multipartResolver() {
         final CommonsMultipartResolver resolver = new CommonsMultipartResolver();
         resolver.setDefaultEncoding(StandardCharsets.UTF_8.name());
         return resolver;
+    }
+
+    /**
+     * Provides property resolving placeholder values, as in key=${some.value}
+     * @return PropertySourcesPlaceholderConfigurer
+     */
+    @Bean
+    public PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
     }
 }
